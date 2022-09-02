@@ -1,10 +1,16 @@
 import requests
+import os
 
 
 class DataManager:
-    #This class is responsible for talking to the Google Sheet.
+    # This class is responsible for talking to the Google Sheet.
     def __init__(self):
-        pass
+        self.headings = os.environ.get("SHEETY_TOKEN")
+
+    def get_sheet(self):
+        sheety_response = requests.get("https://api.sheety.co/954119ebc378bd2f70a8a60b57fdd0d2/flightDeals/prices")
+        sheet_data = sheety_response.json()["prices"]
+        return sheet_data
 
     def update_sheet(self, sheet):
         for row in sheet:

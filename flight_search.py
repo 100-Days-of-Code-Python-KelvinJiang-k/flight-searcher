@@ -1,13 +1,16 @@
 import requests
 from datetime import datetime, timedelta
 from flight_data import FlightData
+import os
+
+TEQUILA_KEY = os.environ.get("TEQUILA_KEY")
 
 
 class FlightSearch:
-    #This class is responsible for talking to the Flight Search API.
+    # This class is responsible for talking to the Flight Search API.
     def __init__(self):
         self.tequila_headers = {
-            "apikey": "oORtdjjo5DIbjrtk2id6Yu6gfUlvyvli",
+            "apikey": TEQUILA_KEY,
         }
 
     def get_IATA_code(self, city: str):
