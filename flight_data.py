@@ -12,5 +12,15 @@ class FlightData:
             self.city_to = flight_data['cityTo']
             self.city_code_to = flight_data['cityCodeTo']
             self.price = flight_data['price']
-            self.departure_date = flight_data['route'][0]['utc_departure']
-            self.return_date = flight_data['route'][1]['utc_departure']
+            self.departure_date = flight_data['route'][0]['utc_departure'].split("T")[0]
+            self.return_date = flight_data['route'][1]['utc_departure'].split("T")[0]
+            self.stop_overs = (len(flight_data['route']) - 2) // 2
+            self.via_city = []
+            # TODO: Specifically determine which cities are stopover to, from cities by checking when destination is met
+
+            # Obtains a list of all stopover cities, including those on the return trip
+            for city in flight_data['route']:
+                if city['cityFrom'] not in ([self.city_from, self.city_to] + self.via_city):
+                    self.via_city.append(city['cityFrom'])
+            self.via_to_city = self.via_city[0:len(self.via_city) // 2]
+            self.via_from_city = self.via_city[len(self.via_city) // 2:len(self.via_city)]

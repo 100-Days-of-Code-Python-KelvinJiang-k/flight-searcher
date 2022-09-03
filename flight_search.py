@@ -4,6 +4,7 @@ from flight_data import FlightData
 import os
 
 TEQUILA_KEY = os.environ.get("TEQUILA_KEY")
+STOPOVER_LIMIT = 1
 
 
 class FlightSearch:
@@ -24,7 +25,7 @@ class FlightSearch:
         iata_code = response.json()['locations'][0]['code']
         return iata_code
 
-    def find_flight(self, iata_code: str):
+    def find_flight(self, iata_code: str, max_stopover=0):
         current_date = datetime.now().strftime("%d/%m/%Y")
         latest_date = (datetime.now() + timedelta(days=180)).strftime("%d/%m/%Y")
 
@@ -38,11 +39,18 @@ class FlightSearch:
             "nights_in_dst_to": 28,
             "flight_type": "round",
             "curr": "GBP",
-            "max_stopovers": 0,
+            "max_stopovers": max_stopover,
             "one_for_city": 1,
         }
 
         response = requests.get(url=tequila_endpoint, params=tequila_params, headers=self.tequila_headers)
         response.raise_for_status()
         flight_data = response.json()["data"]
+
+        # If there are no flights available, it will increase the number of stopovers until one is found or
+        # stopover limit is reached.
+        print(flight_data)
+        if not flight_data and max_stopover < STOPOVER_LIMIT:
+            return self.find_flight(iata_code, tequila_params["max_stopovers"] + 1)
+
         return FlightData(flight_data)
